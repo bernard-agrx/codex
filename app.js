@@ -19,6 +19,8 @@ const state = {
 };
 
 const INITIAL_PRELOAD_ZOOMS = [2, 3];
+const AUTO_ROTATE_SPEED_DEG_PER_SEC = 2;
+const AUTO_ROTATE_UPDATE_DELAY = 800;
 const SCREENSHOT_DELAYS = [
   { delay: 5000, label: '5 seconds' },
   { delay: 10000, label: '10 seconds' },
@@ -29,7 +31,6 @@ const globeCanvas = document.getElementById('globeCanvas');
 const globeCtx = globeCanvas.getContext('2d');
 const loading = document.getElementById('loading');
 const globe = document.getElementById('globe');
-const zoomButtons = document.querySelectorAll('[data-zoom]');
 const screenshotGrid = document.getElementById('screenshotGallery');
 const screenshotStatus = document.getElementById('screenshotStatus');
 
@@ -48,6 +49,9 @@ let pointerId = null;
 let dragStart = { x: 0, y: 0 };
 let startWorldPosition = null;
 let refreshTimer = null;
+let autoRotateFrame = null;
+let autoRotatePaused = false;
+let lastAutoRotateTimestamp = null;
 
 function buildUrl(overrides = {}) {
   const { lat, lon, zoom, layer } = { ...state, ...overrides };
@@ -172,6 +176,40 @@ function captureScreenshot(entry) {
   });
 }
 
+function autoRotateStep(timestamp) {
+  if (!autoRotateFrame) return;
+  if (lastAutoRotateTimestamp === null) {
+    lastAutoRotateTimestamp = timestamp;
+  }
+  const deltaSeconds = (timestamp - lastAutoRotateTimestamp) / 1000;
+  lastAutoRotateTimestamp = timestamp;
+
+  if (!autoRotatePaused && mapImageData) {
+    state.lon = normalizeLon(
+      state.lon + AUTO_ROTATE_SPEED_DEG_PER_SEC * deltaSeconds
+    );
+    scheduleUpdate(AUTO_ROTATE_UPDATE_DELAY);
+  } else {
+    requestRender();
+  }
+
+  autoRotateFrame = requestAnimationFrame(autoRotateStep);
+}
+
+function startAutoRotate() {
+  if (autoRotateFrame) return;
+  autoRotateFrame = requestAnimationFrame(autoRotateStep);
+}
+
+function pauseAutoRotate() {
+  autoRotatePaused = true;
+}
+
+function resumeAutoRotate() {
+  autoRotatePaused = false;
+  lastAutoRotateTimestamp = performance.now();
+}
+
 function renderSphere() {
   if (!mapImageData) return;
   const size = ensureCanvasSize();
@@ -248,7 +286,10 @@ function renderSphere() {
 }
 
 function updateMap() {
-  clearTimeout(refreshTimer);
+  if (refreshTimer) {
+    clearTimeout(refreshTimer);
+    refreshTimer = null;
+  }
   setLoading(true);
   const img = new Image();
   img.crossOrigin = 'anonymous';
@@ -273,9 +314,14 @@ function updateMap() {
   img.src = buildUrl();
 }
 
-function scheduleUpdate() {
-  clearTimeout(refreshTimer);
-  refreshTimer = setTimeout(updateMap, 120);
+function scheduleUpdate(delay = 120) {
+  if (refreshTimer) {
+    return;
+  }
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    updateMap();
+  }, delay);
   requestRender();
 }
 
@@ -309,6 +355,7 @@ function handlePointerDown(event) {
   globe.setPointerCapture(pointerId);
   dragStart = { x: event.clientX, y: event.clientY };
   startWorldPosition = lonLatToWorld(state.lon, state.lat, state.zoom);
+  pauseAutoRotate();
 }
 
 function handlePointerMove(event) {
@@ -340,6 +387,7 @@ function handlePointerUp(event) {
   pointerId = null;
   startWorldPosition = null;
   updateMap();
+  resumeAutoRotate();
 }
 
 function setZoom(nextZoom) {
@@ -356,13 +404,6 @@ function handleWheel(event) {
   setZoom(state.zoom + direction);
 }
 
-zoomButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const direction = button.dataset.zoom === 'in' ? 1 : -1;
-    setZoom(state.zoom + direction);
-  });
-});
-
 initScreenshotEntries();
 
 globe.addEventListener('pointerdown', handlePointerDown);
@@ -372,6 +413,7 @@ globe.addEventListener('pointerleave', handlePointerUp);
 globe.addEventListener('pointercancel', handlePointerUp);
 globe.addEventListener('wheel', handleWheel, { passive: false });
 window.addEventListener('resize', requestRender);
+startAutoRotate();
 
 (async function init() {
   setLoading(true);
