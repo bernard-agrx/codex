@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Yandex Static Earth Globe</title>
+    <title>Yandex Tiles Earth Globe</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -17,21 +17,20 @@
           height="54"
         />
         <div class="headline">
-          <h1>Explore Earth with the Yandex Static Maps API</h1>
+          <h1>Explore Earth with the Yandex Tiles API</h1>
           <p>
-            Drag with your mouse or touchpad to spin the planet, and use the
-            scroll wheel or the on-screen controls to zoom in and out.
+            Drag with your mouse or touchpad to spin the planet and scroll to
+            zoom between satellite tile levels.
+          </p>
+          <p class="preload-status" id="preloadStatus" aria-live="polite">
+            Preparing zoom 1–3 tiles…
           </p>
         </div>
       </header>
       <main>
         <section class="globe" id="globe">
-          <img id="mapImage" alt="Earth map from Yandex" draggable="false" />
-          <div class="loading" id="loading">Loading the globe…</div>
-          <div class="zoom-controls" aria-label="Zoom controls">
-            <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
-            <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
-          </div>
+          <canvas id="glCanvas" aria-label="Interactive Earth globe"></canvas>
+          <div class="loading" id="loading">Loading globe tiles…</div>
         </section>
       </main>
     </div>
