@@ -26,8 +26,12 @@
       </header>
       <main>
         <section class="globe" id="globe">
-          <img id="mapImage" alt="Earth map from Yandex" draggable="false" />
-          <div class="loading" id="loading">Loading the globe…</div>
+          <div class="globe-sphere">
+            <canvas id="globeCanvas" aria-label="Earth map from Yandex"></canvas>
+            <div class="sphere-shading" aria-hidden="true"></div>
+            <div class="sphere-highlight" aria-hidden="true"></div>
+            <div class="loading" id="loading">Loading the globe…</div>
+          </div>
           <div class="zoom-controls" aria-label="Zoom controls">
             <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
             <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
@@ -35,6 +39,6 @@
         </section>
       </main>
     </div>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
