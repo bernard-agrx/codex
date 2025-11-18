@@ -6,7 +6,6 @@ import {
   TILE_SIZE,
 } from './globeMath.js';
 
-const API_KEY = 'b40ca0e3-470d-4bf8-a41d-1247ab4711c8';
 const MAP_WIDTH = 650;
 const MAP_HEIGHT = 450;
 const MIN_ZOOM = 1;
@@ -20,12 +19,19 @@ const state = {
 };
 
 const INITIAL_PRELOAD_ZOOMS = [2, 3];
+const SCREENSHOT_DELAYS = [
+  { delay: 5000, label: '5 seconds' },
+  { delay: 10000, label: '10 seconds' },
+  { delay: 30000, label: '30 seconds' },
+];
 
 const globeCanvas = document.getElementById('globeCanvas');
 const globeCtx = globeCanvas.getContext('2d');
 const loading = document.getElementById('loading');
 const globe = document.getElementById('globe');
 const zoomButtons = document.querySelectorAll('[data-zoom]');
+const screenshotGrid = document.getElementById('screenshotGallery');
+const screenshotStatus = document.getElementById('screenshotStatus');
 
 const sourceCanvas = document.createElement('canvas');
 sourceCanvas.width = MAP_WIDTH;
@@ -34,6 +40,8 @@ const sourceCtx = sourceCanvas.getContext('2d');
 
 let mapImageData = null;
 let renderQueued = false;
+const screenshotEntries = [];
+let screenshotTimersStarted = false;
 
 let pointerActive = false;
 let pointerId = null;
@@ -45,7 +53,7 @@ function buildUrl(overrides = {}) {
   const { lat, lon, zoom, layer } = { ...state, ...overrides };
   return `https://static-maps.yandex.ru/1.x/?l=${layer}&ll=${lon.toFixed(
     6
-  )},${lat.toFixed(6)}&z=${zoom}&size=${MAP_WIDTH},${MAP_HEIGHT}&apikey=${API_KEY}`;
+  )},${lat.toFixed(6)}&z=${zoom}&size=${MAP_WIDTH},${MAP_HEIGHT}`;
 }
 
 function setLoading(isLoading) {
@@ -73,6 +81,66 @@ function requestRender() {
   requestAnimationFrame(() => {
     renderQueued = false;
     renderSphere();
+  });
+}
+
+function createScreenshotEntry(config) {
+  const card = document.createElement('figure');
+  card.className = 'capture-card pending';
+  const preview = document.createElement('div');
+  preview.className = 'capture-preview';
+  const placeholder = document.createElement('span');
+  placeholder.textContent = `Waiting ${config.label}…`;
+  const img = document.createElement('img');
+  img.alt = `Globe capture after ${config.label}`;
+  img.hidden = true;
+  preview.append(placeholder, img);
+  const caption = document.createElement('figcaption');
+  caption.textContent = `Waiting for ${config.label} capture…`;
+  card.append(preview, caption);
+  screenshotGrid?.appendChild(card);
+  return { ...config, card, caption, img, placeholder, captured: false };
+}
+
+function initScreenshotEntries() {
+  if (!screenshotGrid) return;
+  SCREENSHOT_DELAYS.forEach((config) => {
+    screenshotEntries.push(createScreenshotEntry(config));
+  });
+}
+
+function setScreenshotStatus(message) {
+  if (screenshotStatus) {
+    screenshotStatus.textContent = message;
+  }
+}
+
+function startScreenshotTimers() {
+  if (screenshotTimersStarted || screenshotEntries.length === 0) return;
+  screenshotTimersStarted = true;
+  setScreenshotStatus('Capturing globe snapshots…');
+  screenshotEntries.forEach((entry) => {
+    entry.timeoutId = setTimeout(() => captureScreenshot(entry), entry.delay);
+  });
+}
+
+function captureScreenshot(entry) {
+  requestAnimationFrame(() => {
+    try {
+      const dataUrl = globeCanvas.toDataURL('image/png');
+      entry.img.src = dataUrl;
+      entry.img.hidden = false;
+      entry.placeholder.hidden = true;
+      entry.card.classList.remove('pending');
+      entry.card.classList.add('captured');
+      entry.caption.textContent = `Captured after ${entry.label}.`;
+      entry.captured = true;
+      if (screenshotEntries.every((item) => item.captured)) {
+        setScreenshotStatus('All timed screenshots captured.');
+      }
+    } catch (error) {
+      entry.caption.textContent = `Capture failed after ${entry.label}.`;
+    }
   });
 }
 
@@ -148,6 +216,7 @@ function renderSphere() {
   }
 
   globeCtx.putImageData(dest, 0, 0);
+  startScreenshotTimers();
 }
 
 function updateMap() {
@@ -167,6 +236,7 @@ function updateMap() {
       globeCtx.clearRect(0, 0, fallbackSize, fallbackSize);
       globeCtx.drawImage(img, 0, 0, fallbackSize, fallbackSize);
     }
+    startScreenshotTimers();
     setLoading(false);
   };
   img.onerror = () => {
@@ -264,6 +334,8 @@ zoomButtons.forEach((button) => {
     setZoom(state.zoom + direction);
   });
 });
+
+initScreenshotEntries();
 
 globe.addEventListener('pointerdown', handlePointerDown);
 globe.addEventListener('pointermove', handlePointerMove);
