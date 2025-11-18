@@ -45,6 +45,19 @@ body {
   color: #bbbbc1;
 }
 
+.preload-status {
+  font-size: 0.95rem;
+  color: #9ea0aa;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.preload-status[data-complete='true'] {
+  color: #8fe38f;
+}
+
 .logo {
   filter: drop-shadow(0 4px 12px rgb(0 0 0 / 0.65));
 }
@@ -72,14 +85,12 @@ main {
   cursor: grabbing;
 }
 
-#mapImage {
+#glCanvas {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
   user-select: none;
   pointer-events: none;
-  transition: opacity 0.2s ease;
 }
 
 .loading {
@@ -90,37 +101,6 @@ main {
   background: rgb(0 0 0 / 0.4);
   font-weight: 500;
   letter-spacing: 0.08em;
-}
-
-.zoom-controls {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.zoom-controls button {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 0.4);
-  background: rgb(0 0 0 / 0.65);
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.zoom-controls button:hover,
-.zoom-controls button:focus-visible {
-  background: rgb(255 255 255 / 0.2);
-}
-
-.zoom-controls button:active {
-  transform: scale(0.95);
 }
 
 @media (max-width: 600px) {
