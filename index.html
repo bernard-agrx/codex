@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Belgrade Static Map</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="wrapper">
+        <h1>Belgrade Map Preview</h1>
+        <p>
+          This demo uses the <a href="https://yandex.com/maps-api/docs/static-api/index.html" target="_blank" rel="noreferrer noopener">Yandex Static Maps API</a>
+          to display a snapshot of downtown Belgrade, Serbia.
+        </p>
+      </div>
+    </header>
+    <main class="wrapper">
+      <section class="map-card">
+        <img
+          src="https://static-maps.yandex.ru/1.x/?ll=20.457273,44.787197&size=650,450&z=12&l=map&pt=20.457273,44.787197,pm2rdl"
+          alt="Static map of Belgrade, Serbia from Yandex Maps"
+          width="650"
+          height="450"
+          loading="lazy"
+        />
+        <div class="map-info">
+          <h2>Belgrade City Center</h2>
+          <ul>
+            <li><strong>Coordinates:</strong> 44.787197° N, 20.457273° E</li>
+            <li><strong>Zoom level:</strong> 12 (city overview)</li>
+            <li><strong>Layers:</strong> Map + Red placemark at Republic Square</li>
+          </ul>
+          <p>
+            The Static Maps API generates this image on-the-fly. You can adjust the
+            coordinates (<code>ll</code>), zoom (<code>z</code>), or add multiple placemarks (<code>pt</code>)
+            to customize the snapshot.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="wrapper">
+        Built with ❤️ for a quick look at Belgrade via Yandex Maps Static API.
+      </div>
+    </footer>
+  </body>
+</html>
