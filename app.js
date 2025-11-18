@@ -19,8 +19,8 @@ const state = {
 };
 
 const INITIAL_PRELOAD_ZOOMS = [2, 3];
-const AUTO_ROTATE_SPEED_DEG_PER_SEC = 2;
-const AUTO_ROTATE_UPDATE_DELAY = 800;
+const AUTO_ROTATE_SPEED_DEG_PER_SEC = 15;
+const AUTO_ROTATE_UPDATE_DELAY = 200;
 const SCREENSHOT_DELAYS = [
   { delay: 5000, label: '5 seconds' },
   { delay: 10000, label: '10 seconds' },
@@ -29,7 +29,6 @@ const SCREENSHOT_DELAYS = [
 
 const globeCanvas = document.getElementById('globeCanvas');
 const globeCtx = globeCanvas.getContext('2d');
-const loading = document.getElementById('loading');
 const globe = document.getElementById('globe');
 const screenshotGrid = document.getElementById('screenshotGallery');
 const screenshotStatus = document.getElementById('screenshotStatus');
@@ -61,7 +60,6 @@ function buildUrl(overrides = {}) {
 }
 
 function setLoading(isLoading) {
-  loading.hidden = !isLoading;
   globeCanvas.style.opacity = isLoading ? 0.4 : 1;
 }
 
