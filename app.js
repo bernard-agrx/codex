@@ -18,7 +18,7 @@ const state = {
   layer: 'sat',
 };
 
-const INITIAL_PRELOAD_ZOOMS = [2, 3];
+const INITIAL_PRELOAD_ZOOMS = [1, 2, 3];
 const AUTO_ROTATE_SPEED_DEG_PER_SEC = 15;
 const AUTO_ROTATE_UPDATE_DELAY = 200;
 const SCREENSHOT_DELAYS = [
@@ -60,7 +60,7 @@ function buildUrl(overrides = {}) {
 }
 
 function setLoading(isLoading) {
-  globeCanvas.style.opacity = isLoading ? 0.4 : 1;
+  globeCanvas.style.filter = isLoading ? 'brightness(100%)' : 'none';
 }
 
 function ensureCanvasSize() {
