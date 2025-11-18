@@ -216,6 +216,27 @@ main {
   color: #9a9aaa;
 }
 
+.capture-download {
+  align-self: flex-start;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  color: #fff;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.capture-download:hover,
+.capture-download:focus-visible {
+  background: rgb(255 255 255 / 0.15);
+  color: #fff;
+}
+
+.capture-card.pending .capture-download {
+  display: none;
+}
+
 @media (max-width: 600px) {
   .intro {
     align-items: center;

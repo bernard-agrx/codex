@@ -97,9 +97,26 @@ function createScreenshotEntry(config) {
   preview.append(placeholder, img);
   const caption = document.createElement('figcaption');
   caption.textContent = `Waiting for ${config.label} capture…`;
-  card.append(preview, caption);
+  const downloadLink = document.createElement('a');
+  downloadLink.className = 'capture-download';
+  downloadLink.textContent = 'Download PNG';
+  downloadLink.download = `globe-${config.label.replace(/[^0-9]+/g, '') || 'capture'}.png`;
+  downloadLink.hidden = true;
+  downloadLink.setAttribute(
+    'aria-label',
+    `Download the ${config.label} screenshot once it is ready`
+  );
+  card.append(preview, caption, downloadLink);
   screenshotGrid?.appendChild(card);
-  return { ...config, card, caption, img, placeholder, captured: false };
+  return {
+    ...config,
+    card,
+    caption,
+    img,
+    placeholder,
+    captured: false,
+    downloadLink,
+  };
 }
 
 function initScreenshotEntries() {
@@ -134,12 +151,23 @@ function captureScreenshot(entry) {
       entry.card.classList.remove('pending');
       entry.card.classList.add('captured');
       entry.caption.textContent = `Captured after ${entry.label}.`;
+      if (entry.downloadLink) {
+        entry.downloadLink.href = dataUrl;
+        entry.downloadLink.hidden = false;
+        entry.downloadLink.setAttribute(
+          'aria-label',
+          `Download the ${entry.label} screenshot`
+        );
+      }
       entry.captured = true;
       if (screenshotEntries.every((item) => item.captured)) {
         setScreenshotStatus('All timed screenshots captured.');
       }
     } catch (error) {
       entry.caption.textContent = `Capture failed after ${entry.label}.`;
+      if (entry.downloadLink) {
+        entry.downloadLink.hidden = true;
+      }
     }
   });
 }
