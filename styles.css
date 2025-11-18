@@ -23,32 +23,6 @@ body {
   gap: clamp(1.5rem, 3vw, 3rem);
 }
 
-.intro {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  align-items: flex-start;
-}
-
-.intro .headline {
-  max-width: 720px;
-}
-
-.intro h1 {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  font-weight: 600;
-}
-
-.intro p {
-  margin: 0;
-  color: #bbbbc1;
-}
-
-.logo {
-  filter: drop-shadow(0 4px 12px rgb(0 0 0 / 0.65));
-}
-
 main {
   flex: 1;
   display: flex;
@@ -195,14 +169,3 @@ main {
   display: none;
 }
 
-@media (max-width: 600px) {
-  .intro {
-    align-items: center;
-    text-align: center;
-  }
-
-  .logo {
-    width: 150px;
-    height: auto;
-  }
-}
